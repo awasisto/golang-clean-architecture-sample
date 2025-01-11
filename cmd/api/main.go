@@ -9,9 +9,9 @@ import (
 )
 
 func main() {
-	employeeDataSource := database.NewInMemoryEmployeeDatabase()
+	employeeRepository := database.NewInMemoryEmployeeDatabase()
 	avatarProvider := avatarprovider.NewGithubAvatarProvider()
-	employeeController := controllers.NewEmployeeController(employeeDataSource, avatarProvider)
+	employeeController := controllers.NewEmployeeController(employeeRepository, avatarProvider)
 	employeeRouter := routers.NewEmployeeRouter(*employeeController)
 	http.ListenAndServe("0.0.0.0:8080", &employeeRouter.MuxRouter)
 }

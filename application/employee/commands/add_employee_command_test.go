@@ -13,15 +13,15 @@ func TestAddEmployee(t *testing.T) {
 
 	defer ctrl.Finish()
 
-	mockEmployeeDataSource := mocks.NewMockEmployeeDataSource(ctrl)
+	mockEmployeeRepository := mocks.NewMockEmployeeRepository(ctrl)
 	mockAvatarProvider := mocks.NewMockAvatarProvider(ctrl)
 
 	addEmployeeCommandHandler := NewAddEmployeeCommandHandler(
-		mockEmployeeDataSource,
+		mockEmployeeRepository,
 		mockAvatarProvider,
 	)
 
-	mockEmployeeDataSource.EXPECT().
+	mockEmployeeRepository.EXPECT().
 		Add(entities.Employee{
 			Name:  "John Smith",
 			Email: "john.smith@example.com",

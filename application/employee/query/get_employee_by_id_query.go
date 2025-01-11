@@ -10,22 +10,22 @@ type GetEmployeeByIdQuery struct {
 }
 
 type GetEmployeeByIdQueryHandler struct {
-	employeeDataSource interfaces.EmployeeDataSource
+	employeeRepository interfaces.EmployeeRepository
 	avatarProvider     interfaces.AvatarProvider
 }
 
 func NewGetEmployeeByIdQueryHandler(
-	employeeDataSource interfaces.EmployeeDataSource,
+	employeeRepository interfaces.EmployeeRepository,
 	avatarProvider interfaces.AvatarProvider,
 ) *GetEmployeeByIdQueryHandler {
 	return &GetEmployeeByIdQueryHandler{
-		employeeDataSource: employeeDataSource,
+		employeeRepository: employeeRepository,
 		avatarProvider:     avatarProvider,
 	}
 }
 
 func (h *GetEmployeeByIdQueryHandler) Handle(request GetEmployeeByIdQuery) (*entities.Employee, error) {
-	employee, err := h.employeeDataSource.GetById(request.EmployeeId)
+	employee, err := h.employeeRepository.GetById(request.EmployeeId)
 	if err != nil {
 		return nil, err
 	}

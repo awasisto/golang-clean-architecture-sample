@@ -14,16 +14,16 @@ import (
 )
 
 type EmployeeController struct {
-	employeeDataSource interfaces.EmployeeDataSource
+	employeeRepository interfaces.EmployeeRepository
 	avatarProvider     interfaces.AvatarProvider
 }
 
 func NewEmployeeController(
-	employeeDataSource interfaces.EmployeeDataSource,
+	employeeRepository interfaces.EmployeeRepository,
 	avatarProvider interfaces.AvatarProvider,
 ) *EmployeeController {
 	return &EmployeeController{
-		employeeDataSource: employeeDataSource,
+		employeeRepository: employeeRepository,
 		avatarProvider:     avatarProvider,
 	}
 }
@@ -43,7 +43,7 @@ func (c *EmployeeController) AddEmployee(httpResponseWriter http.ResponseWriter,
 	}
 
 	addEmployeeHandler := commands.NewAddEmployeeCommandHandler(
-		c.employeeDataSource,
+		c.employeeRepository,
 		c.avatarProvider,
 	)
 
@@ -67,7 +67,7 @@ func (c *EmployeeController) AddEmployee(httpResponseWriter http.ResponseWriter,
 }
 
 func (c *EmployeeController) GetAllEmployees(httpResponseWriter http.ResponseWriter, _ *http.Request) {
-	getAllEmployeesHandler := query.NewGetAllEmployeesQueryHandler(c.employeeDataSource, c.avatarProvider)
+	getAllEmployeesHandler := query.NewGetAllEmployeesQueryHandler(c.employeeRepository, c.avatarProvider)
 
 	employees, err := getAllEmployeesHandler.Handle(query.GetAllEmployeesQuery{})
 	if err != nil {
@@ -101,7 +101,7 @@ func (c *EmployeeController) GetEmployeeById(httpResponseWriter http.ResponseWri
 		return
 	}
 
-	getEmployeeByIdHandler := query.NewGetEmployeeByIdQueryHandler(c.employeeDataSource, c.avatarProvider)
+	getEmployeeByIdHandler := query.NewGetEmployeeByIdQueryHandler(c.employeeRepository, c.avatarProvider)
 
 	employee, err := getEmployeeByIdHandler.Handle(query.GetEmployeeByIdQuery{EmployeeId: employeeId})
 	if err != nil {
@@ -123,6 +123,36 @@ func (c *EmployeeController) GetEmployeeById(httpResponseWriter http.ResponseWri
 	}
 
 	writeJsonHttpResponse(httpResponseWriter, http.StatusOK, responseObj)
+}
+
+func (c *EmployeeController) DeleteEmployeeById(httpResponseWriter http.ResponseWriter, httpRequest *http.Request) {
+	strEmployeeId, employeeIdSpecified := mux.Vars(httpRequest)["employee_id"]
+	if !employeeIdSpecified {
+		writeJsonHttpResponse(httpResponseWriter, http.StatusBadRequest, models.ErrorResponse{Message: "employee_id not specified"})
+		return
+	}
+
+	employeeId, err := strconv.Atoi(strEmployeeId)
+	if err != nil {
+		writeJsonHttpResponse(httpResponseWriter, http.StatusBadRequest, models.ErrorResponse{Message: "invalid employee_id format"})
+		return
+	}
+
+	deleteEmployeeByIdHandler := commands.NewDeleteEmployeeByIdCommandHandler(c.employeeRepository)
+
+	err = deleteEmployeeByIdHandler.Handle(commands.DeleteEmployeeByIdCommand{EmployeeId: employeeId})
+	if err != nil {
+		var statusCode int
+		if err == errors.ErrNotFound {
+			statusCode = http.StatusNotFound
+		} else {
+			statusCode = http.StatusInternalServerError
+		}
+		writeJsonHttpResponse(httpResponseWriter, statusCode, models.ErrorResponse{Message: err.Error()})
+		return
+	}
+
+	httpResponseWriter.WriteHeader(http.StatusNoContent)
 }
 
 func writeJsonHttpResponse(httpResponseWriter http.ResponseWriter, statusCode int, responseObj interface{}) {

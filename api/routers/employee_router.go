@@ -34,5 +34,10 @@ func NewEmployeeRouter(
 		Methods(http.MethodGet).
 		HandlerFunc(controller.GetEmployeeById)
 
+	employeeRouter.MuxRouter.
+		Path("/api/employees/{employee_id}").
+		Methods(http.MethodDelete).
+		HandlerFunc(controller.DeleteEmployeeById)
+
 	return &employeeRouter
 }

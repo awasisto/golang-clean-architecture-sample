@@ -6,16 +6,22 @@ import (
 )
 
 type InMemoryEmployeeDatabase struct {
-	employees []entities.Employee
+	employees map[int]entities.Employee
+	nextId    int
 }
 
 func NewInMemoryEmployeeDatabase() *InMemoryEmployeeDatabase {
-	return &InMemoryEmployeeDatabase{}
+	return &InMemoryEmployeeDatabase{
+		employees: make(map[int]entities.Employee),
+		nextId:    1,
+	}
 }
 
 func (d *InMemoryEmployeeDatabase) Add(employee entities.Employee) (int, error) {
-	d.employees = append(d.employees, employee)
-	return len(d.employees) - 1, nil
+	employee.Id = d.nextId
+	d.employees[d.nextId] = employee
+	d.nextId++
+	return employee.Id, nil
 }
 
 func (d *InMemoryEmployeeDatabase) GetAll() ([]entities.Employee, error) {
@@ -27,8 +33,18 @@ func (d *InMemoryEmployeeDatabase) GetAll() ([]entities.Employee, error) {
 }
 
 func (d *InMemoryEmployeeDatabase) GetById(id int) (*entities.Employee, error) {
-	if id < 0 || id >= len(d.employees) {
+	employee, exists := d.employees[id]
+	if !exists {
 		return nil, errors.ErrNotFound
 	}
-	return &d.employees[id], nil
+	return &employee, nil
+}
+
+func (d *InMemoryEmployeeDatabase) DeleteById(id int) error {
+	_, exists := d.employees[id]
+	if !exists {
+		return errors.ErrNotFound
+	}
+	delete(d.employees, id)
+	return nil
 }

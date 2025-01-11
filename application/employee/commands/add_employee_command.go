@@ -11,16 +11,16 @@ type AddEmployeeCommand struct {
 }
 
 type AddEmployeeCommandHandler struct {
-	employeeDataSource interfaces.EmployeeDataSource
+	employeeRepository interfaces.EmployeeRepository
 	avatarProvider     interfaces.AvatarProvider
 }
 
 func NewAddEmployeeCommandHandler(
-	employeeDataSource interfaces.EmployeeDataSource,
+	employeeRepository interfaces.EmployeeRepository,
 	avatarProvider interfaces.AvatarProvider,
 ) *AddEmployeeCommandHandler {
 	return &AddEmployeeCommandHandler{
-		employeeDataSource: employeeDataSource,
+		employeeRepository: employeeRepository,
 		avatarProvider:     avatarProvider,
 	}
 }
@@ -31,7 +31,7 @@ func (h *AddEmployeeCommandHandler) Handle(request AddEmployeeCommand) (createdE
 		Email: request.Email,
 	}
 
-	entity.Id, err = h.employeeDataSource.Add(entity)
+	entity.Id, err = h.employeeRepository.Add(entity)
 	if err != nil {
 		return nil, err
 	}

@@ -8,22 +8,22 @@ import (
 type GetAllEmployeesQuery struct{}
 
 type GetAllEmployeesQueryHandler struct {
-	employeeDataSource interfaces.EmployeeDataSource
+	employeeRepository interfaces.EmployeeRepository
 	avatarProvider     interfaces.AvatarProvider
 }
 
 func NewGetAllEmployeesQueryHandler(
-	employeeDataSource interfaces.EmployeeDataSource,
+	employeeRepository interfaces.EmployeeRepository,
 	avatarProvider interfaces.AvatarProvider,
 ) *GetAllEmployeesQueryHandler {
 	return &GetAllEmployeesQueryHandler{
-		employeeDataSource: employeeDataSource,
+		employeeRepository: employeeRepository,
 		avatarProvider:     avatarProvider,
 	}
 }
 
 func (h *GetAllEmployeesQueryHandler) Handle(request GetAllEmployeesQuery) ([]entities.Employee, error) {
-	employees, err := h.employeeDataSource.GetAll()
+	employees, err := h.employeeRepository.GetAll()
 	if err != nil {
 		return nil, err
 	}

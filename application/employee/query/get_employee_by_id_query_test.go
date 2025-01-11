@@ -13,15 +13,15 @@ func TestGetEmployeeById(t *testing.T) {
 
 	defer ctrl.Finish()
 
-	mockEmployeeDataSource := mocks.NewMockEmployeeDataSource(ctrl)
+	mockEmployeeRepository := mocks.NewMockEmployeeRepository(ctrl)
 	mockAvatarProvider := mocks.NewMockAvatarProvider(ctrl)
 
 	getEmployeeByIdQueryHandler := NewGetEmployeeByIdQueryHandler(
-		mockEmployeeDataSource,
+		mockEmployeeRepository,
 		mockAvatarProvider,
 	)
 
-	mockEmployeeDataSource.EXPECT().
+	mockEmployeeRepository.EXPECT().
 		GetById(42).
 		Return(
 			&entities.Employee{

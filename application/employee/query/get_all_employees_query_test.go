@@ -13,15 +13,15 @@ func TestGetAllEmployees(t *testing.T) {
 
 	defer ctrl.Finish()
 
-	mockEmployeeDataSource := mocks.NewMockEmployeeDataSource(ctrl)
+	mockEmployeeRepository := mocks.NewMockEmployeeRepository(ctrl)
 	mockAvatarProvider := mocks.NewMockAvatarProvider(ctrl)
 
 	getAllEmployeesQueryHandler := NewGetAllEmployeesQueryHandler(
-		mockEmployeeDataSource,
+		mockEmployeeRepository,
 		mockAvatarProvider,
 	)
 
-	mockEmployeeDataSource.EXPECT().
+	mockEmployeeRepository.EXPECT().
 		GetAll().
 		Return(
 			[]entities.Employee{
